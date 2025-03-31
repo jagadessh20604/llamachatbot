@@ -32,8 +32,5 @@
     ],
     "env": {
         "PYTHONPATH": "."
-    },
-    "auth": {
-        "required": false
     }
 } 
