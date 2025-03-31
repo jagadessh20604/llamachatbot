@@ -8,6 +8,17 @@
     ],
     "routes": [
         {
+            "src": "/api/health",
+            "dest": "app.py",
+            "methods": ["GET"],
+            "headers": {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        },
+        {
             "src": "/api/(.*)",
             "dest": "app.py",
             "methods": ["GET", "POST", "OPTIONS"],
