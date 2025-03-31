@@ -9,7 +9,7 @@ import traceback
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # Allow all origins for /api routes
 
 # Configure Together API
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
@@ -24,8 +24,16 @@ Together.api_key = TOGETHER_API_KEY
 def health_check():
     return jsonify({"status": "healthy"})
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
+    if request.method == 'OPTIONS':
+        # Handle preflight request
+        response = jsonify({"status": "ok"})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST')
+        return response
+
     try:
         data = request.json
         if not data:
