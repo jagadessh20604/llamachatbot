@@ -20,9 +20,6 @@ print(f"API Key loaded: {TOGETHER_API_KEY[:5]}...")  # Print first 5 chars of AP
 
 Together.api_key = TOGETHER_API_KEY
 
-# Initialize Together client
-client = Together()
-
 @app.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({"status": "healthy"})
@@ -44,14 +41,19 @@ def chat():
         
         # Generate response using Together API with Llama model
         print("Sending request to Together API...")  # Log before API call
-        response = client.chat.completions.create(
+        response = Together().inference(
             model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-            messages=[{"role": "user", "content": last_message}],
+            prompt=last_message,
+            max_tokens=1024,
+            temperature=0.7,
+            top_p=0.7,
+            top_k=50,
+            repetition_penalty=1.1,
         )
         print("Received response from Together API")  # Log after API call
-        print(f"Response content: {response.choices[0].message.content}")  # Log the response
+        print(f"Response content: {response['output']['choices'][0]['text']}")  # Log the response
         
-        return jsonify({"response": response.choices[0].message.content})
+        return jsonify({"response": response['output']['choices'][0]['text']})
         
     except Exception as e:
         print(f"Error in chat endpoint: {str(e)}")  # Log the error
@@ -62,11 +64,16 @@ def chat():
 if __name__ == '__main__':
     # Test the API directly
     print("Testing API...")
-    test_response = client.chat.completions.create(
+    test_response = Together().inference(
         model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-        messages=[{"role": "user", "content": "Hello, how are you?"}],
+        prompt="Hello, how are you?",
+        max_tokens=1024,
+        temperature=0.7,
+        top_p=0.7,
+        top_k=50,
+        repetition_penalty=1.1,
     )
-    print(f"Test response: {test_response.choices[0].message.content}")
+    print(f"Test response: {test_response['output']['choices'][0]['text']}")
     print("API test completed.")
     
     app.run(host='0.0.0.0', port=3001, debug=True) 
